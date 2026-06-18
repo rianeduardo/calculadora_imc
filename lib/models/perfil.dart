@@ -2,8 +2,8 @@ class Perfil {
   int? id;
   String nome;
   double altura;
-  String? sexo;
-  String? dataNascimento;
+  String sexo;
+  String dataNascimento;
 
   Perfil({
     this.id,
@@ -28,8 +28,8 @@ class Perfil {
       id: map['id'] as int?,
       nome: map['nome'] as String,
       altura: map['altura'] as double,
-      sexo: map['sexo'] as String?,
-      dataNascimento: map['dataNascimento'] as String?,
+      sexo: map['sexo'] as String,
+      dataNascimento: map['dataNascimento'] as String,
     );
   }
 }

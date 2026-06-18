@@ -14,14 +14,14 @@ class _RegistroPerfilState extends State<RegistroPerfil> {
 
   final _nomeController = TextEditingController();
   late double _altura;
-  String? _sexo = "";
+  String? _sexo = "Masculino";
   String? _dataNascimento;
 
   final PerfilController _perfilController = PerfilController();
   final _dataController = TextEditingController();
 
   Future<void> _selecionarData() async {
-    final DateTime? data = await showDatePicker(
+    DateTime? data = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(1900),
@@ -29,8 +29,9 @@ class _RegistroPerfilState extends State<RegistroPerfil> {
     );
 
     if (data != null) {
+      String dataFormatada = data.toIso8601String();
       setState(() {
-        _dataNascimento = data;
+        _dataNascimento = dataFormatada;
         _dataController.text =
             "${data.day.toString().padLeft(2, '0')}/"
             "${data.month.toString().padLeft(2, '0')}/"
@@ -48,7 +49,7 @@ class _RegistroPerfilState extends State<RegistroPerfil> {
         nome: _nomeController.text,
         altura: _altura,
         sexo: _sexo!,
-        dataNascimento: _dataNascimento!.toIso8601String(),
+        dataNascimento: _dataNascimento!,
       );
 
       bool sucesso = await _perfilController.criarPerfil(novoPerfil) > 0;
