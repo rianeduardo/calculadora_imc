@@ -24,8 +24,9 @@ class _RegistroPesoState extends State<RegistroPeso> {
   void _dataSelecionada(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2026),
+      initialDate: _selectedDate,
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
     );
 
     if (picked != null && picked != _selectedDate) {

@@ -3,7 +3,9 @@ import 'package:calculadora_imc/controllers/perfil_controller.dart';
 import 'package:calculadora_imc/models/perfil.dart';
 
 class RegistroPerfil extends StatefulWidget {
-  const RegistroPerfil({super.key});
+  final Perfil? perfil;
+
+  const RegistroPerfil({super.key, this.perfil});
 
   @override
   State<RegistroPerfil> createState() => _RegistroPerfilState();
@@ -13,12 +15,28 @@ class _RegistroPerfilState extends State<RegistroPerfil> {
   final _formKey = GlobalKey<FormState>();
 
   final _nomeController = TextEditingController();
-  late double _altura;
+  final _alturaController = TextEditingController();
   String? _sexo = "Masculino";
   String? _dataNascimento;
 
   final PerfilController _perfilController = PerfilController();
   final _dataController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.perfil != null) {
+      _nomeController.text = widget.perfil!.nome;
+      _alturaController.text = widget.perfil!.altura.toString();
+      _sexo = widget.perfil!.sexo;
+      _dataNascimento = widget.perfil!.dataNascimento;
+      // format date if present
+      try {
+        final d = DateTime.parse(_dataNascimento!);
+        _dataController.text = "${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}";
+      } catch (_) {}
+    }
+  }
 
   Future<void> _selecionarData() async {
     DateTime? data = await showDatePicker(
@@ -45,14 +63,20 @@ class _RegistroPerfilState extends State<RegistroPerfil> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      final novoPerfil = Perfil(
+      final perfilModel = Perfil(
+        id: widget.perfil?.id,
         nome: _nomeController.text,
-        altura: _altura,
+        altura: double.parse(_alturaController.text.replaceAll(',', '.')),
         sexo: _sexo!,
         dataNascimento: _dataNascimento!,
       );
 
-      bool sucesso = await _perfilController.criarPerfil(novoPerfil) > 0;
+      bool sucesso = false;
+      if (widget.perfil != null) {
+        sucesso = await _perfilController.atualizarPerfil(perfilModel) > 0;
+      } else {
+        sucesso = await _perfilController.criarPerfil(perfilModel) > 0;
+      }
 
       if (sucesso) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -61,11 +85,11 @@ class _RegistroPerfilState extends State<RegistroPerfil> {
             backgroundColor: Colors.green,
           ),
         );
-        Navigator.pop(context);
+        Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erro ao criar o perfil'),
+            content: Text('Erro ao salvar o perfil'),
             backgroundColor: Colors.red,
           ),
         );
@@ -76,7 +100,7 @@ class _RegistroPerfilState extends State<RegistroPerfil> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Cadastrar Novo Perfil")),
+      appBar: AppBar(title: Text(widget.perfil != null ? "Editar Perfil" : "Cadastrar Novo Perfil")),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Form(
@@ -97,8 +121,9 @@ class _RegistroPerfilState extends State<RegistroPerfil> {
               ),
               SizedBox(height: 16),
 
-              // Campo Raça
+              // Campo Altura
               TextFormField(
+                controller: _alturaController,
                 decoration: const InputDecoration(
                   labelText: "Altura (em metros)",
                 ),
@@ -115,9 +140,6 @@ class _RegistroPerfilState extends State<RegistroPerfil> {
                   }
 
                   return null;
-                },
-                onSaved: (value) {
-                  _altura = double.parse(value!.replaceAll(',', '.'));
                 },
               ),
               SizedBox(height: 16),
@@ -174,7 +196,7 @@ class _RegistroPerfilState extends State<RegistroPerfil> {
                   padding: EdgeInsets.symmetric(vertical: 16),
                   textStyle: TextStyle(fontSize: 18),
                 ),
-                child: Text("Salvar Cadastro"),
+                child: Text(widget.perfil != null ? "Atualizar Perfil" : "Salvar Cadastro"),
               ),
             ],
           ),

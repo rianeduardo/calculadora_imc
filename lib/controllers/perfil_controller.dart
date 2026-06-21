@@ -8,5 +8,7 @@ class PerfilController {
 
   Future<int> deletarPerfil(int id) async => _db.deletarPerfil(id);
 
+  Future<int> atualizarPerfil(Perfil perfil) async => _db.atualizarPerfil(perfil);
+
   Future<List<Perfil>> listarPerfis() async => _db.getPerfis();
 }

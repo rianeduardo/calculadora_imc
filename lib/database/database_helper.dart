@@ -49,6 +49,9 @@ class DatabaseHelper {
   Future<int> criarPerfil(Perfil perfil) async =>
       (await database).insert("perfis", perfil.toMap());
 
+    Future<int> atualizarPerfil(Perfil perfil) async =>
+      (await database).update("perfis", perfil.toMap(), where: "id = ?", whereArgs: [perfil.id]);
+
   Future<int> deletarPerfil(int id) async =>
       (await database).delete("perfis", where: "id = ?", whereArgs: [id]);
 
